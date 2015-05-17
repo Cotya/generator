@@ -1,0 +1,12 @@
+{
+    "name": "cotya/generator",
+    "description": "generates you whole modules from more or less",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Flyingmana",
+            "email": "flyingmana@googlemail.com"
+        }
+    ],
+    "require": {}
+}
