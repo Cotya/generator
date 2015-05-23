@@ -1,0 +1,7 @@
+<cotya-module-definition>
+    <vendorName>Acme</vendorName>
+    <moduleName>Blog</moduleName>
+    <models>
+        <doctrine-mapping-file filename="./models/Post.dcm.xml" />
+    </models>
+</cotya-module-definition>
