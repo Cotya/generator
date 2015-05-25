@@ -34,13 +34,13 @@ class Model
         $modelIdentifier =  $this->getModelIdentifier($className);
         $this->createModelFile($className, $buildpath);
         $this->createGeneratedModelFile($className, $modelIdentifier, $buildpath);
-        /*
         $ressouceClassName = $this->getResourceModelClassName($className);
-        $this->createModelFile($ressouceClassName);
-        $this->createGeneratedModelFile($ressouceClassName, $modelIdentifier, $entity);
+        $this->createModelFile($ressouceClassName, $buildpath);
+        $this->createGeneratedModelFile($ressouceClassName, $modelIdentifier, $buildpath);
         $collectionClassName = $this->getCollectionClassName($className);
-        $this->createModelFile($collectionClassName);
-        $this->createGeneratedModelFile($collectionClassName, $modelIdentifier, $entity);
+        $this->createModelFile($collectionClassName, $buildpath);
+        $this->createGeneratedModelFile($collectionClassName, $modelIdentifier, $buildpath);
+        /*
         $this->createInstallScript($className, $modelIdentifier, $entity);
         $this->createXmlConfig($className, $modelIdentifier, $entity);
         */
