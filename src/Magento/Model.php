@@ -125,46 +125,37 @@ class Model
         $factory = new \PhpParser\BuilderFactory;
         $class = $factory->class($generatedClassName);
         $class->extend($this->getGeneratedClassName($className));
-        
-        //$code = new Zend_CodeGenerator_Php_Class();
-        
+
+        $constructMethod = $factory->method('_construct');
+        $constructMethod->makePublic();
         $parentCallStmt = new Expr\StaticCall(new Node\Name('parent'), '_construct');
 
-        
         if (strpos($className, '_Collection') !== false) {
             $class->extend('Mage_Core_Model_Resource_Db_Collection_Abstract');
             $idFieldName = $this->idFieldName;
-
-            $class->addStmt($factory->method('_construct')
-                ->addStmt(new Expr\MethodCall(
-                    new Expr\Variable('this'),
-                    '_init',
-                    [new Node\Scalar\String_($modelIdentifier), new Node\Scalar\String_($idFieldName)]
-                ))
-                ->addStmt($parentCallStmt));
+            $class->addStmt($constructMethod->addStmt(new Expr\MethodCall(
+                new Expr\Variable('this'),
+                '_init',
+                [new Node\Scalar\String_($modelIdentifier), new Node\Scalar\String_($idFieldName)]
+            )));
         } elseif (strpos($className, '_Resource_') !== false) {
             $class->extend('Mage_Core_Model_Resource_Db_Abstract');
             $idFieldName = $this->idFieldName;
-
-            $class->addStmt($factory->method('_construct')
-                ->addStmt(new Expr\MethodCall(
-                    new Expr\Variable('this'),
-                    '_init',
-                    [new Node\Scalar\String_($modelIdentifier), new Node\Scalar\String_($idFieldName)]
-                ))
-                ->addStmt($parentCallStmt));
+            $class->addStmt($constructMethod->addStmt(new Expr\MethodCall(
+                new Expr\Variable('this'),
+                '_init',
+                [new Node\Scalar\String_($modelIdentifier), new Node\Scalar\String_($idFieldName)]
+            )));
         } else {
             $class->extend('Mage_Core_Model_Abstract');
-
-            $class->addStmt($factory->method('_construct')
-                ->addStmt(new Expr\MethodCall(
-                    new Expr\Variable('this'),
-                    '_init',
-                    [new Node\Scalar\String_($modelIdentifier)]
-                ))
-                ->addStmt($parentCallStmt));
+            $class->addStmt($constructMethod->addStmt(new Expr\MethodCall(
+                new Expr\Variable('this'),
+                '_init',
+                [new Node\Scalar\String_($modelIdentifier)]
+            )));
         }
-
+        $constructMethod->addStmt($parentCallStmt);
+        
         $this->generateClassFile($filePath, $class);
     }
 
