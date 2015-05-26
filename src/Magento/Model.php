@@ -40,9 +40,9 @@ class Model
         $collectionClassName = $this->getCollectionClassName($className);
         $this->createModelFile($collectionClassName, $buildpath);
         $this->createGeneratedModelFile($collectionClassName, $modelIdentifier, $buildpath);
+        $this->createInstallScript($className, $modelIdentifier, $this->modelDefinition->getProperties());
+        $this->createXmlConfig($className, $modelIdentifier);
         /*
-        $this->createInstallScript($className, $modelIdentifier, $entity);
-        $this->createXmlConfig($className, $modelIdentifier, $entity);
         */
         return null;
     }
@@ -159,7 +159,116 @@ class Model
         $this->generateClassFile($filePath, $class);
     }
 
-    private function createXmlConfig($className, $modelIdentifier, SimpleXMLElement $entity)
+
+    /**
+     * @param $className
+     * @param $modelIdentifier
+     * @param $properties Definition\Model\Property[]
+     */
+    protected function createInstallScript($className, $modelIdentifier, $properties)
+    {
+
+        $code = <<<'PHP'
+$installer = $this;
+
+/* @var $installer Mage_Core_Model_Resource_Setup */
+$installer->startSetup();
+
+$tableName = $installer->getTable('%1$s');
+
+$table = $installer->getConnection()
+    ->newTable($tableName)
+    %2$s
+    ->setComment('%3$s');
+
+$installer->getConnection()->createTable($table);
+
+$installer->endSetup();
+PHP;
+
+        $columns = '';
+        foreach ($properties as $property) {
+            if ($property->getType() === 'id') {
+                $columns .= <<<PHP
+    ->addColumn(
+        '{$property->getName()}',
+        Varien_Db_Ddl_Table::TYPE_BIGINT,
+        null,
+        array(
+            'auto_increment' => true,
+            'unsigned'  => true,
+            'nullable'  => false,
+            'primary'   => true,
+        ),
+        'id'
+    )
+PHP;
+            } elseif ($property->getType() === 'reference') {
+                $columns .= <<<PHP
+
+    ->addColumn(
+        '{$property->getName()}',
+        Varien_Db_Ddl_Table::TYPE_BIGINT,
+        null,
+        array(
+            'unsigned'  => true,
+            'nullable'  => false,
+        ),
+        'id'
+    )
+PHP;
+            } else {
+                $fieldType = $this->getMagentoDBFieldTypeByProperty($property);
+                $lenght = 'null';
+                if ('string' == $property->getType()) {
+                    $lenght = $property->getLength();
+                }
+
+                $columns .= <<<PHP
+
+    ->addColumn('{$property->getName()}',
+        {$fieldType},
+        {$lenght},
+        array(
+            'nullable'  => false,
+        ),
+        '{$property->getName()}'
+    )
+PHP;
+            }
+
+            $columns .= <<<PHP
+            
+PHP;
+        }
+
+        $code = sprintf(
+            $code,
+            $modelIdentifier,
+            $columns,
+            $className
+        );
+
+
+
+        echo "<?php\n\n".$code.PHP_EOL;
+    }
+
+    private function getMagentoDBFieldTypeByProperty(Definition\Model\Property $property)
+    {
+        $typeMapping = [
+            'integer' => 'Varien_Db_Ddl_Table::TYPE_INTEGER',
+            'string' => 'Varien_Db_Ddl_Table::TYPE_TEXT',
+            'text' => 'Varien_Db_Ddl_Table::TYPE_TEXT',
+            'datetime' => 'Varien_Db_Ddl_Table::TYPE_DATETIME',
+        ];
+        if (!isset($typeMapping[(string)$property->getType()])) {
+            throw new \Exception('Mapping Type not possible');
+        }
+        return $typeMapping[(string)$property->getType()];
+    }
+    
+    private function createXmlConfig($className, $modelIdentifier)
     {
         $parts = explode('/', $modelIdentifier);
         $tableName = str_replace('_Model', '', $className);
