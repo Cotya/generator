@@ -32,4 +32,17 @@ We need to define a Schema/Standard for the base xml, and we also need Ideas for
 2. `composer.phar install`
 3. try out the stuff in the examples directory
 
+## The schema
+
+the `schema/defined/` directory of this project trys to list and describe all the possible parts of the xml,
+to define a new module.
+Every Tag has an own file, and if it can have child tags,
+we have analog a directory with files for every Tag allowed inside this Tag.
+
+Tags which are not finalized yet and still need work/review/voting are added in `schema/draft/` 
+with identical directory structure as described before for `schema/defined/` 
+
+We may have later a real xml schema file, but its to early for this, also I would need help,
+as I have no experience with xml schemas yet.
+
 
