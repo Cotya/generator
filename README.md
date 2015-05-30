@@ -1,6 +1,8 @@
 Cotya/Generator
 ===============
 
+[![Join the chat at https://gitter.im/Cotya/generator](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Cotya/generator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 *generates you whole modules(magento,more) from more or less then an xml file*
     
 
